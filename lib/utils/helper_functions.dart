@@ -28,12 +28,11 @@ late PageController pageController; // Declares the page controller variable
 const initialPage = 1200; // Sets initial page as 1200
 
 // Layout related variables
-late PageController _pageController; // Declares the page controller variable
-final defaultIconTheme = const IconThemeData(color: Colors.white);
+const defaultIconTheme = IconThemeData(color: Colors.white);
 final positiveBalanceBackground = Colors.blue.shade100;
 final negativeBalanceBackground = Colors.red.shade100;
-final primaryButton = Colors.black;
-final primaryBackground = Colors.white;
+const primaryButton = Colors.black;
+const primaryBackground = Colors.white;
 final cardGreen = Colors.green.shade100;
 final cardRed = Colors.yellow.shade100;
 int _deletedItemCount = 0; // Starts the count of deleted messages at zero

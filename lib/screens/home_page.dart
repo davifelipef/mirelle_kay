@@ -1,6 +1,6 @@
 import 'package:mirelle_kay/widgets/app_bar.dart';
 import 'package:mirelle_kay/widgets/balance_card.dart';
-import 'package:mirelle_kay/widgets/home_page_body.dart';
+import 'package:mirelle_kay/widgets/date_selection.dart';
 import 'package:mirelle_kay/utils/helper_functions.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
       appBar: const AppBarDesign(),
       body: Column(
         children: [
-          HomePageBody(pageController: calcPageController()),
+          DateSelection(pageController: calcPageController()),
           const BalanceCard(),
           // TODO - Rest of the code
         ],
