@@ -15,7 +15,7 @@ class MyDrawer extends StatelessWidget {
             'Mirelle Kay',
             style: TextStyle(
               fontSize: 20,
-              color: Colors.black,
+              color: whiteColor,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -29,9 +29,44 @@ class MyDrawer extends StatelessWidget {
         },
       ),
       ListTile(
-        leading: const Icon(Icons.person),
-        title: const Text('User name'),
-        subtitle: const Text('User e-mail'),
+        leading: const Icon(
+          Icons.person,
+          color: whiteColor,
+        ),
+        title: const Text(
+          'User name',
+          style: TextStyle(
+            fontSize: 15,
+            color: whiteColor,
+          ),
+        ),
+        subtitle: const Text(
+          'User e-mail',
+          style: TextStyle(
+            fontSize: 15,
+            color: whiteColor,
+          ),
+        ),
+        tileColor: secondColor, // Custom background color
+        /*shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),*/
+        onTap: () {
+          // Handle user profile tap
+        },
+      ),
+      ListTile(
+        leading: const Icon(
+          Icons.home,
+          color: whiteColor,
+        ),
+        title: const Text(
+          'Vendas',
+          style: TextStyle(
+            fontSize: 15,
+            color: whiteColor,
+          ),
+        ),
         tileColor: mainColor, // Custom background color
         /*shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mirelle_kay/utils/config.dart';
 
 class AppBarDesign extends StatelessWidget implements PreferredSizeWidget {
   const AppBarDesign({super.key});
@@ -17,7 +18,7 @@ class AppBarDesign extends StatelessWidget implements PreferredSizeWidget {
         "Vendas",
         style: TextStyle(
           fontSize: 20,
-          color: Colors.black,
+          color: whiteColor,
           fontWeight: FontWeight.bold,
         ),
       ),

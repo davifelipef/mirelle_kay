@@ -30,6 +30,8 @@ const initialPage = 1200; // Sets initial page as 1200
 // Layout related variables
 const defaultIconTheme = IconThemeData(color: Colors.white);
 const mainColor = Color.fromRGBO(202, 154, 254, 1);
+const secondColor = Color.fromRGBO(164, 125, 206, 1);
+const whiteColor = Color.fromRGBO(255, 255, 255, 1);
 final positiveBalanceBackground = Colors.blue.shade100;
 final negativeBalanceBackground = Colors.red.shade100;
 const primaryButton = Colors.black;
