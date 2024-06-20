@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mirelle_kay/utils/helper_functions.dart';
+import 'package:mirelle_kay/utils/config.dart';
+import 'package:mirelle_kay/utils/helpers.dart';
 
 class BalanceCard extends StatelessWidget {
   const BalanceCard({super.key});

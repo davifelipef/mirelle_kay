@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mirelle_kay/utils/helper_functions.dart';
+import 'package:mirelle_kay/utils/config.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
