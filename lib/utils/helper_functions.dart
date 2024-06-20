@@ -24,11 +24,13 @@ late DateTime initialDate;
 late String formattedDate;
 
 // Page navigation variables
+String appBarTitle = "Vendas";
 late PageController pageController; // Declares the page controller variable
 const initialPage = 1200; // Sets initial page as 1200
 
 // Layout related variables
 const defaultIconTheme = IconThemeData(color: Colors.white);
+const mainColor = Color.fromRGBO(202, 154, 254, 1);
 final positiveBalanceBackground = Colors.blue.shade100;
 final negativeBalanceBackground = Colors.red.shade100;
 const primaryButton = Colors.black;
@@ -37,6 +39,11 @@ final cardGreen = Colors.green.shade100;
 final cardRed = Colors.yellow.shade100;
 int _deletedItemCount = 0; // Starts the count of deleted messages at zero
 Timer? _messageTimer;
+
+updateTitle(String newTitle) {
+  appBarTitle = newTitle;
+  return appBarTitle;
+}
 
 // Helper function that updates the current date by calculating the new date based on the index
 void updateCurrentDate(int index) {
