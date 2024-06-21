@@ -34,14 +34,14 @@ class MyDrawer extends StatelessWidget {
           color: whiteColor,
         ),
         title: const Text(
-          'User name',
+          'Nome do usuário',
           style: TextStyle(
             fontSize: 15,
             color: whiteColor,
           ),
         ),
         subtitle: const Text(
-          'User e-mail',
+          'E-mail do usuário',
           style: TextStyle(
             fontSize: 15,
             color: whiteColor,
@@ -67,10 +67,41 @@ class MyDrawer extends StatelessWidget {
             color: whiteColor,
           ),
         ),
-        tileColor: mainColor, // Custom background color
-        /*shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),*/
+        tileColor: mainColor,
+        onTap: () {
+          // Handle user profile tap
+        },
+      ),
+      ListTile(
+        leading: const Icon(
+          Icons.inventory_2,
+          color: whiteColor,
+        ),
+        title: const Text(
+          'Estoque',
+          style: TextStyle(
+            fontSize: 15,
+            color: whiteColor,
+          ),
+        ),
+        tileColor: mainColor,
+        onTap: () {
+          // Handle user profile tap
+        },
+      ),
+      ListTile(
+        leading: const Icon(
+          Icons.group,
+          color: whiteColor,
+        ),
+        title: const Text(
+          'Clientes',
+          style: TextStyle(
+            fontSize: 15,
+            color: whiteColor,
+          ),
+        ),
+        tileColor: mainColor,
         onTap: () {
           // Handle user profile tap
         },
