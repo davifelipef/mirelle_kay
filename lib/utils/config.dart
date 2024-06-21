@@ -23,7 +23,7 @@ late DateTime initialDate;
 late String formattedDate;
 
 // Page navigation variables
-String appBarTitle = "Vendas";
+String pageTitle = "";
 late PageController pageController; // Declares the page controller variable
 const initialPage = 1200; // Sets initial page as 1200
 

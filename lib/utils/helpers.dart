@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
-// Helper functions that updates the app bar text based on the screen opened
-updateTitle(String newTitle) {
-  appBarTitle = newTitle;
-  return appBarTitle;
+void updatePageTitle(String title) {
+  pageTitle = title;
 }
 
 // Helper function that updates the current date by calculating the new date based on the index
