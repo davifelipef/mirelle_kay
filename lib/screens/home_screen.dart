@@ -5,14 +5,14 @@ import 'package:mirelle_kay/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:mirelle_kay/widgets/drawer.dart';
 
-class HomePage extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   static const String routeName = "/home";
-  const HomePage({super.key});
+  const HomeScreen({super.key});
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();

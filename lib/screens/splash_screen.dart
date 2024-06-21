@@ -22,7 +22,7 @@ class SplashScreenState extends State<SplashScreen> {
     await GoogleFonts.pendingFonts([]);
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     }
   }

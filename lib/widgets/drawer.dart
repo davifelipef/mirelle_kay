@@ -64,7 +64,7 @@ class MyDrawer extends StatelessWidget {
             ),
             tileColor: mainColor,
             onTap: () {
-              // Handle user profile tap
+              Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           ListTile(
@@ -81,7 +81,7 @@ class MyDrawer extends StatelessWidget {
             ),
             tileColor: mainColor,
             onTap: () {
-              // Handle user profile tap
+              Navigator.pushReplacementNamed(context, '/sales');
             },
           ),
           ListTile(
@@ -98,7 +98,7 @@ class MyDrawer extends StatelessWidget {
             ),
             tileColor: mainColor,
             onTap: () {
-              // Handle user profile tap
+              Navigator.pushReplacementNamed(context, '/inventory');
             },
           ),
           ListTile(
@@ -115,7 +115,7 @@ class MyDrawer extends StatelessWidget {
             ),
             tileColor: mainColor,
             onTap: () {
-              // Handle user profile tap
+              Navigator.pushReplacementNamed(context, '/clients');
             },
           ),
         ]));
