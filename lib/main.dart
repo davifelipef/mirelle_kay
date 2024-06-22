@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
       ],
       debugShowCheckedModeBanner:
           false, //if set to false, disables the debug banner
+      // Ensure the splash screen is visible for at least 2 seconds
       home: const SplashScreen(),
       routes: {
         HomeScreen.routeName: (context) => const HomeScreen(),

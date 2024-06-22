@@ -23,10 +23,11 @@ class _InventoryScreen extends State<InventoryScreen> {
       appBar: AppBarDesign(),
       drawer: MyDrawer(),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
             padding: EdgeInsetsDirectional.only(top: 10.0),
-            child: Placeholder(),
+            child: Center(child: Text("Em construção.")),
           ),
           // TODO - Rest of the code
         ],

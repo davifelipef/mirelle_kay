@@ -19,14 +19,15 @@ class _ClientsScreen extends State<ClientsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarDesign(),
-      drawer: const MyDrawer(),
+    return const Scaffold(
+      appBar: AppBarDesign(),
+      drawer: MyDrawer(),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsetsDirectional.only(top: 10.0),
-            child: Placeholder(),
+            padding: EdgeInsetsDirectional.only(top: 10.0),
+            child: Center(child: Text("Em construção.")),
           ),
           // TODO - Rest of the code
         ],
