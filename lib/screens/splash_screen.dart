@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mirelle_kay/screens/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,7 +18,10 @@ class SplashScreenState extends State<SplashScreen> {
   Future<void> _loadFontAndNavigate() async {
     // Ensure the splash screen is visible for at least 2 seconds
     await Future.delayed(const Duration(seconds: 2));
-    await GoogleFonts.pendingFonts([]);
+
+    // Load fonts (simulated delay)
+    await _loadFonts();
+
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -27,9 +29,17 @@ class SplashScreenState extends State<SplashScreen> {
     }
   }
 
+  Future<void> _loadFonts() async {
+    // Simulate loading fonts with a delay (you can replace with actual font loading logic)
+    await Future.wait([
+      // Add your font loading logic here
+      // Example: await GoogleFonts.openSans().load(),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
       ),

@@ -19,13 +19,13 @@ class _InventoryScreen extends State<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarDesign(),
-      drawer: const MyDrawer(),
+    return const Scaffold(
+      appBar: AppBarDesign(),
+      drawer: MyDrawer(),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsetsDirectional.only(top: 10.0),
+            padding: EdgeInsetsDirectional.only(top: 10.0),
             child: Placeholder(),
           ),
           // TODO - Rest of the code

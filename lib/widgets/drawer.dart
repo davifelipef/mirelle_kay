@@ -11,7 +11,9 @@ class MyDrawer extends StatelessWidget {
         child: ListView(padding: EdgeInsets.zero, children: [
           ListTile(
             title: const Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsetsDirectional.only(
+                  start: 38.0, top: 36.0, bottom: 10.0),
+              //padding: EdgeInsets.all(8.0),
               child: Text(
                 'Mirelle Kay',
                 style: TextStyle(

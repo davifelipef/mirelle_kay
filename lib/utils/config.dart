@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'dart:async';
 
 // Text fields setup variables
@@ -11,11 +12,19 @@ final List<String> typeOptions = ['Entrada', 'Saída'];
 final TextEditingController _valueController = TextEditingController();
 final _formKey = GlobalKey<FormState>();
 
-// Hive related setup
+// Hive related setup - Events
 Map<int, String> eventsMap = {};
 List<Map<String, dynamic>> events = [];
 var eventsList = [];
 final eventsBox = Hive.box("events_box");
+
+// Hive related setup - Products
+final dio = Dio();
+Set<int> fetchedProductKeys = {};
+Map<int, String> productsMap = {};
+List<Map<String, dynamic>> products = [];
+var productsList = [];
+final productsBox = Hive.box("products_box");
 
 // Date setup variables
 late DateTime currentDate;
