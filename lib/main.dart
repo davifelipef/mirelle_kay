@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mirelle_kay/screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,7 +10,14 @@ import 'package:mirelle_kay/screens/sales_screen.dart';
 import 'package:mirelle_kay/screens/clients_screen.dart';
 import 'package:mirelle_kay/screens/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  // Open Hive boxes
+  await Hive.openBox("events_box");
+  await Hive.openBox("products_box");
   LicenseRegistry.addLicense(() async* {
     final license =
         await rootBundle.loadString('assets/google_fonts/LICENSE.txt');

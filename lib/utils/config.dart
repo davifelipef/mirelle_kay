@@ -1,4 +1,4 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:async';
@@ -24,7 +24,7 @@ Set<int> fetchedProductKeys = {};
 Map<int, String> productsMap = {};
 List<Map<String, dynamic>> products = [];
 var productsList = [];
-final productsBox = Hive.box("products_box");
+//final productsBox = Hive.box("products_box");
 
 // Date setup variables
 late DateTime currentDate;

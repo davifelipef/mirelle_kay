@@ -1,140 +1,114 @@
-import 'package:mirelle_kay/utils/config.dart';
-import 'package:dio/dio.dart';
-import 'package:html/parser.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' show parse;
 
-// Captures the products from the internet
-Future<void> getProducts(int? itemKey) async {
-  if (itemKey != null) {
-    // Check if dividends for the itemKey have already been fetched
-    if (fetchedProductKeys.contains(itemKey)) {
-      print("Product for key $itemKey have already been fetched. Skipping...");
-      return;
-    }
-    fetchedProductKeys.add(itemKey);
-    final existingProduct =
-        products.firstWhere((element) => element["key"] == itemKey);
-    final product = existingProduct["product"];
-    print("O product recebido para pesquisa é $product");
-    final headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Linux; Android 12; Pixel 6 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Mobile Safari/537.36"
-    };
+final productsBox = Hive.box("products_box");
 
-    // Check if product already exists in productsList before making requests
-    if (productsList.contains(product)) {
-      print(
-          "O produto $product já foi pesquisado anteriormente. Pulando a pesquisa.");
-      return;
-    } else {
-      if (product) {
-        // First tries the FII url
-        var url = "https://loja.marykay.com.br/cuidados-Faciais";
-        print("fetching the url $url");
+Future<void> fetchProductDetails() async {
+  const sitemapUrl = 'https://loja.marykay.com.br/sitemap/product-0.xml';
 
-        // Wait 5 seconds before making the request
-        await Future.delayed(const Duration(seconds: 5));
-        print("5 seconds pause between requests");
+  final sitemapResponse = await http.get(Uri.parse(sitemapUrl));
 
-        try {
-          final response =
-              await dio.get(url, options: Options(headers: headers));
-          print("$url está sendo aberta");
-          var document = parse(response.data);
-          // Try to access the page
-          if (response.statusCode == 200) {
-            productsList.add(product);
-            print("$product added to the productsList");
-            print("Current product list is: $productsList");
-            // Gets the current stock value
-            var stockValue = document.querySelector(
-                'div[title="Valor atual do ativo"] > strong[class="value"]');
-            var tableRows =
-                document.querySelectorAll('table tbody tr:first-child');
-            print("The tableRows are $tableRows");
-            var currentMonth =
-                formattedDate.split('/')[1]; // Extract target month
-            var totalDividend = 0.00;
-            if (tableRows.isNotEmpty) {
-              var row = tableRows[0];
-              print("Children of row $row");
-              var children = row.children;
-              if (children.length >= 4) {
-                var paymentDate = children[2].text;
-                var paymentMonth = paymentDate.split('/')[1];
-                print("Date fetched is $paymentDate");
-                print("Month fetched is $paymentMonth");
-                if (paymentMonth == currentMonth) {
-                  var dividendValue = children[3].text;
-                  print("Dividend value fetched is $dividendValue");
-                  totalDividend +=
-                      double.parse(dividendValue.replaceAll(',', '.'));
-                  print(
-                      "Total dividends fetched for this item is $totalDividend");
-                }
-              } else {
-                print("Row $row does not have enough elements.");
-              }
-            }
+  int productKey = 0;
 
-            var lastProduct = totalDividend;
-            print(stockValue?.text);
-            print("Last dividend payed is: $lastProduct");
+  Set<int> fetchedProductKeys = {};
 
-            try {
-              print("Updating products map");
-              productsMap[itemKey] = lastProduct.toString();
-              print("Current dividends map is: $productsMap");
-              //_refreshItems();
-            } catch (e) {
-              print("Error setting dividend: $e");
-            }
-          } else {
-            // #TODO FII-infra logic enters here
-            print("StatusCode: ${response.statusCode}");
-            print("Response body: $response");
-          }
-        } catch (e) {
-          print("Erro ao fazer a requisição: $e");
+  if (sitemapResponse.statusCode == 200) {
+    print("Response OK");
+
+    var document = parse(sitemapResponse.body);
+    var urls = document.getElementsByTagName('loc');
+
+    for (var urlElement in urls) {
+      var productUrl = urlElement.text;
+      final response = await http.get(Uri.parse(productUrl));
+
+      if (response.statusCode == 200) {
+        var productDocument = parse(response.body);
+
+        // Extract product name
+        var titleElement =
+            productDocument.querySelector('title[data-react-helmet="true"]');
+        var productName = titleElement?.text ?? '';
+
+        // Filter out "- Mary Kay" from product name
+        productName = productName.replaceAll('- Mary Kay', '').trim();
+
+        // Extract product image URL
+        var imageElement =
+            productDocument.querySelector('meta[property="og:image"]');
+        var imageUrl = imageElement?.attributes['content'] ?? '';
+
+        // Extract product price
+        var priceElement = productDocument
+            .querySelector('meta[property="product:price:amount"]');
+        var price = priceElement?.attributes['content'] ?? '';
+
+        // Extract product reference number
+        var skuElement =
+            productDocument.querySelector('meta[property="product:sku"]');
+        var referenceNumber = skuElement?.attributes['content'] ?? '';
+
+        // Extract product availability
+        var availabilityElement = productDocument
+            .querySelector('meta[property="product:availability"]');
+        var availability = availabilityElement?.attributes['content'] ?? '';
+
+        if (availability != 'oos') {
+          productKey++;
+          fetchedProductKeys.add(productKey);
+
+          print('Produtos armazenados: ${fetchedProductKeys.length}');
+
+          // Calls the helper function that saves the products to the hive box
+          saveProducts(productKey, productName, imageUrl, price,
+              referenceNumber, availability);
+
+          /* Debug prints
+          print('Product key assigned: $productKey');
+          print('Key: $productKey');
+          print('Name: $productName');
+          print('Image URL: $imageUrl');
+          print('Price: $price');
+          print('Reference Number: $referenceNumber');
+          print('Availability: $availability');
+          print('---');*/
+        } else {
+          print('$productName está fora de estoque.');
+          print('---');
         }
       } else {
-        // #TODO Ações logic enters here
-
-        // Wait 5 seconds before making the request
-        await Future.delayed(const Duration(seconds: 5));
-        print("5 seconds pause between requests");
-
-        // Tries the acoes url
-        var url = "https://statusinvest.com.br/acoes/$product";
-
-        try {
-          final response =
-              await dio.get(url, options: Options(headers: headers));
-          print("$url está sendo aberta");
-          var document = parse(response.data);
-          // Try to access the page
-          if (response.statusCode == 200) {
-            var stockValue = document.querySelector(
-                'div[title="Valor atual do ativo"] > strong[class="value"]');
-            var lastProduct = document.querySelector(
-                'div[class="d-flex align-items-center"] > strong[class="value d-inline-block fs-5 fw-900"]');
-            print(stockValue?.text);
-            print(lastProduct?.text);
-
-            if (stockValue != null) {
-              print("O product $product é uma ação.");
-              productsList.add(product);
-              print("products já pesquisados: $productsList");
-            } else {
-              // do nothing
-            }
-          } else {
-            print("StatusCode: ${response.statusCode}");
-            print("Response body: $response");
-          }
-        } catch (e) {
-          print("Erro ao fazer a requisição: $e");
-        }
+        print('Failed to load product details');
       }
     }
+  } else {
+    print('Failed to load sitemap');
   }
 }
+
+void saveProducts(
+    productKey, productName, imageUrl, price, referenceNumber, availability) {
+  // Create a map for the product
+  var productMap = {
+    'key': productKey,
+    'name': productName,
+    'imageUrl': imageUrl,
+    'price': price,
+    'referenceNumber': referenceNumber,
+    'availability': availability,
+  };
+
+  print('$productName saved to the hive box');
+
+  // Store the product in Hive
+  productsBox.put(productKey, productMap);
+}
+
+/*void main() async {
+  print('Fetching product details...');
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  // Open the hive box
+  Hive.openBox("products_box");
+  await fetchProductDetails();
+}*/
