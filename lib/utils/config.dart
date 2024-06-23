@@ -24,7 +24,7 @@ Set<int> fetchedProductKeys = {};
 Map<int, String> productsMap = {};
 List<Map<String, dynamic>> products = [];
 var productsList = [];
-//final productsBox = Hive.box("products_box");
+final productsBox = Hive.box("products_box");
 
 // Date setup variables
 late DateTime currentDate;

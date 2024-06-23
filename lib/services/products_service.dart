@@ -1,8 +1,11 @@
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
-final productsBox = Hive.box("products_box");
+List<Map<String, String>> productsList = [];
 
 Future<void> fetchProductDetails() async {
   const sitemapUrl = 'https://loja.marykay.com.br/sitemap/product-0.xml';
@@ -10,7 +13,6 @@ Future<void> fetchProductDetails() async {
   final sitemapResponse = await http.get(Uri.parse(sitemapUrl));
 
   int productKey = 0;
-
   Set<int> fetchedProductKeys = {};
 
   if (sitemapResponse.statusCode == 200) {
@@ -58,21 +60,20 @@ Future<void> fetchProductDetails() async {
           productKey++;
           fetchedProductKeys.add(productKey);
 
-          print('Produtos armazenados: ${fetchedProductKeys.length}');
+          //print('Produtos armazenados: ${fetchedProductKeys.length}');
 
-          // Calls the helper function that saves the products to the hive box
-          saveProducts(productKey, productName, imageUrl, price,
+          // Add product details to productsList
+          productsList.add({
+            'key': productKey.toString(),
+            'name': productName,
+            'imageUrl': imageUrl,
+            'price': price,
+            'referenceNumber': referenceNumber,
+            'availability': availability,
+          });
+
+          await printProducts(productKey, productName, imageUrl, price,
               referenceNumber, availability);
-
-          /* Debug prints
-          print('Product key assigned: $productKey');
-          print('Key: $productKey');
-          print('Name: $productName');
-          print('Image URL: $imageUrl');
-          print('Price: $price');
-          print('Reference Number: $referenceNumber');
-          print('Availability: $availability');
-          print('---');*/
         } else {
           print('$productName está fora de estoque.');
           print('---');
@@ -81,16 +82,18 @@ Future<void> fetchProductDetails() async {
         print('Failed to load product details');
       }
     }
+
+    // After processing all products, save to JSON
+    //await saveProducts();
   } else {
     print('Failed to load sitemap');
   }
 }
 
-void saveProducts(
-    productKey, productName, imageUrl, price, referenceNumber, availability) {
-  // Create a map for the product
-  var productMap = {
-    'key': productKey,
+Future<void> printProducts(productKey, productName, imageUrl, price,
+    referenceNumber, availability) async {
+  var productJson = {
+    'key': productKey.toString(),
     'name': productName,
     'imageUrl': imageUrl,
     'price': price,
@@ -98,17 +101,24 @@ void saveProducts(
     'availability': availability,
   };
 
-  print('$productName saved to the hive box');
-
-  // Store the product in Hive
-  productsBox.put(productKey, productMap);
+  // Print product in JSON format
+  print(jsonEncode(productJson));
 }
 
-/*void main() async {
-  print('Fetching product details...');
-  WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  // Open the hive box
-  Hive.openBox("products_box");
-  await fetchProductDetails();
-}*/
+Future<void> saveProducts() async {
+  // Get the directory for the app's documents directory
+  final directory = await getApplicationDocumentsDirectory();
+
+  // Ensure that the assets/data directory exists
+  final productsDirectory =
+      Directory(path.join(directory.path, 'assets', 'data'));
+  if (!await productsDirectory.exists()) {
+    await productsDirectory.create(recursive: true);
+  }
+
+  // Create or overwrite products.json file with updated productsList
+  final file = File(path.join(productsDirectory.path, 'products.json'));
+  await file.writeAsString(jsonEncode(productsList));
+
+  print('Data saved to lib/assets/data/products.json');
+}

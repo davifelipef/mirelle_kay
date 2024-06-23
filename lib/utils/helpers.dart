@@ -2,6 +2,10 @@ import 'package:mirelle_kay/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 void updatePageTitle(String title) {
   pageTitle = title;
@@ -83,4 +87,23 @@ PageController calcPageController() {
   pageController = PageController(initialPage: initialPage);
   refreshItems();
   return pageController;
+}
+
+Future<void> loadJsonToHive() async {
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File(path.join(directory.path, 'products.json'));
+
+  if (await file.exists()) {
+    final jsonString = await file.readAsString();
+    final List<dynamic> jsonData = jsonDecode(jsonString);
+
+    for (var i = 0; i < jsonData.length; i++) {
+      final product = jsonData[i];
+      productsBox.put(i, product);
+    }
+
+    print('Data loaded from JSON to Hive');
+  } else {
+    print('JSON file not found');
+  }
 }

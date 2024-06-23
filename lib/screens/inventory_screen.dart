@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mirelle_kay/utils/helpers.dart';
-import 'package:mirelle_kay/services/products_service.dart'; // Import your updated fetch function
+import 'package:flutter/services.dart' show rootBundle; // Import rootBundle
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mirelle_kay/widgets/app_bar.dart';
 import 'package:mirelle_kay/widgets/drawer.dart';
 
@@ -20,13 +22,37 @@ class InventoryScreenState extends State<InventoryScreen> {
   void initState() {
     super.initState();
     updatePageTitle("Estoque");
-    fetchProductDetails(); // Call to fetch and store products in Hive
-    loadProductsFromHive(); // Load products from Hive after fetching
+    checkAndLoadProducts();
+  }
+
+  Future<void> checkAndLoadProducts() async {
+    try {
+      final jsonString =
+          await rootBundle.loadString('assets/data/products.json');
+      await loadJsonToHive(jsonString);
+      loadProductsFromHive();
+    } catch (e) {
+      print('Error loading JSON: $e');
+      // Handle error appropriately (e.g., show error message)
+    }
+  }
+
+  Future<void> loadJsonToHive(String jsonString) async {
+    final List<dynamic> jsonData = jsonDecode(jsonString);
+
+    for (var i = 0; i < jsonData.length; i++) {
+      final product = jsonData[i];
+      Hive.box('products_box').put(i, product);
+    }
+
+    print('Data loaded from JSON to Hive');
   }
 
   void loadProductsFromHive() {
-    // Load products from Hive
-    products = List<Map<String, dynamic>>.from(productsBox.values);
+    final box = Hive.box('products_box');
+    setState(() {
+      products = box.values.toList().cast<Map<String, dynamic>>();
+    });
   }
 
   @override
@@ -44,24 +70,36 @@ class InventoryScreenState extends State<InventoryScreen> {
             )
           else
             Expanded(
-              child: ListView.builder(
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  var product = products[index];
-                  return ListTile(
-                    leading: Image.network(product['image']),
-                    title: Text(product['name']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Preço: ${product['price']}'),
-                        Text(
-                            'Número de referência: ${product['referenceNumber']}'),
-                        Text('Disponibilidade: ${product['availability']}'),
-                      ],
-                    ),
-                  );
-                },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.builder(
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    var product = products[index];
+                    return Card(
+                      child: ListTile(
+                        leading: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: Center(
+                            child: Image.network(
+                              product['imageUrl'],
+                            ),
+                          ),
+                        ),
+                        title: Text(product['name']),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Preço: R\$ ${product['price']}'),
+                            Text(
+                                'Número de referência: ${product['referenceNumber']}'),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
         ],
