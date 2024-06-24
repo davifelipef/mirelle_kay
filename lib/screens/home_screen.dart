@@ -4,6 +4,8 @@ import 'package:mirelle_kay/widgets/date_selection.dart';
 import 'package:mirelle_kay/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:mirelle_kay/widgets/drawer.dart';
+import 'package:mirelle_kay/widgets/add_event_button.dart';
+import 'package:mirelle_kay/widgets/events_list.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = "/home";
@@ -17,6 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     updatePageTitle("Fluxo de caixa");
+    loadEventsFromHive();
+    refreshItems();
   }
 
   @override
@@ -32,9 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const BalanceCard(),
           const Divider(),
-          // TODO - Rest of the code
+          const EventsList(),
         ],
       ),
+      floatingActionButton: const AddEventButton(),
     );
   }
 }

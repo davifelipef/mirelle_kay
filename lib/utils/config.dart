@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:async';
 
+//Box<Map<dynamic, dynamic>> get eventsBox => Hive.box<Map<dynamic, dynamic>>('events_box');
+
 // Text fields setup variables
-final TextEditingController _nameController = TextEditingController();
-final TextEditingController _typeController = TextEditingController();
-final TextEditingController _dateController = TextEditingController();
+final TextEditingController nameController = TextEditingController();
+final TextEditingController typeController = TextEditingController();
+final TextEditingController dateController = TextEditingController();
 String? selectedType;
 final List<String> typeOptions = ['Entrada', 'Saída'];
-final TextEditingController _valueController = TextEditingController();
-final _formKey = GlobalKey<FormState>();
+final TextEditingController valueController = TextEditingController();
+final formKey = GlobalKey<FormState>();
 
 // Hive related setup - Events
 Map<int, String> eventsMap = {};
 List<Map<String, dynamic>> events = [];
 var eventsList = [];
-final eventsBox = Hive.box("events_box");
+final eventsBox = Hive.box<Map<dynamic, dynamic>>("events_box");
 
 // Hive related setup - Products
 final dio = Dio();
@@ -27,7 +29,7 @@ var productsList = [];
 final productsBox = Hive.box("products_box");
 
 // Date setup variables
-late DateTime currentDate;
+var currentDate = DateTime.now();
 late DateTime initialDate;
 late String formattedDate;
 
@@ -47,5 +49,5 @@ const primaryButton = Colors.black;
 const primaryBackground = Colors.white;
 final cardGreen = Colors.green.shade100;
 final cardRed = Colors.yellow.shade100;
-int _deletedItemCount = 0; // Starts the count of deleted messages at zero
-Timer? _messageTimer;
+int deletedItemCount = 0; // Starts the count of deleted messages at zero
+Timer? messageTimer;

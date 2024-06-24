@@ -16,7 +16,7 @@ void main() async {
   await Hive.initFlutter();
 
   // Open Hive boxes
-  await Hive.openBox("events_box");
+  await Hive.openBox<Map<dynamic, dynamic>>("events_box");
   await Hive.openBox("products_box");
   LicenseRegistry.addLicense(() async* {
     final license =
