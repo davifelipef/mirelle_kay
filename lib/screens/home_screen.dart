@@ -15,12 +15,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic> _filteredData = [];
   @override
   void initState() {
     super.initState();
     updatePageTitle("Fluxo de caixa");
     loadEventsFromHive();
-    refreshItems();
+    _refreshItems();
+  }
+
+  //This function updartes the UI
+  Future<void> _refreshItems() async {
+    final data = await refreshItems();
+    setState(() {
+      print("Updated the UI");
+      _filteredData = data;
+    });
+  }
+
+  void createNewItem(Map<String, dynamic> newEvent) {
+    createItem(newEvent, _refreshItems);
   }
 
   @override
@@ -36,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const BalanceCard(),
           const Divider(),
-          const EventsList(),
+          EventsList(events: _filteredData),
         ],
       ),
       floatingActionButton: const AddEventButton(),

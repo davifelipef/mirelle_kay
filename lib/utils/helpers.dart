@@ -123,13 +123,27 @@ Future<void> loadEventsFromHive() async {
 }
 
 // Creates a new item
-Future<void> createItem(Map<String, dynamic> newEvent) async {
+/*Future<void> createItem(Map<String, dynamic> newEvent) async {
   try {
     print("Creating item: $newEvent");
     await eventsBox.add(newEvent);
     print("Item created successfully.");
     loadEventsFromHive();
     refreshItems(); // Updates the UI
+  } catch (e) {
+    print("Error creating item: $e");
+  }
+}*/
+
+// Creates a new item
+Future<void> createItem(
+    Map<String, dynamic> newEvent, VoidCallback onComplete) async {
+  try {
+    print("Creating item: $newEvent");
+    await eventsBox.add(newEvent);
+    print("Item created successfully.");
+    loadEventsFromHive();
+    onComplete(); // Notify to refresh the UI
   } catch (e) {
     print("Error creating item: $e");
   }
@@ -385,7 +399,7 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey) async {
                           "date": formattedDate,
                         };
                         if (itemKey == null) {
-                          await createItem(newEvent);
+                          await createItem(newEvent, refreshItems);
                         } else {
                           await updateItem(itemKey, newEvent);
                         }

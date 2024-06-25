@@ -3,7 +3,9 @@ import 'package:mirelle_kay/utils/helpers.dart';
 import 'package:mirelle_kay/utils/config.dart';
 
 class EventsList extends StatelessWidget {
-  const EventsList({super.key});
+  final List<dynamic> events;
+
+  const EventsList({super.key, required this.events});
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +13,8 @@ class EventsList extends StatelessWidget {
       child: ListView.builder(
         itemCount: events.length,
         itemBuilder: (_, index) {
-          final currentItem = events[index];
-          String valueString = currentItem["value"] ?? "0.0";
+          final event = events[index];
+          String valueString = event["value"] ?? "0.0";
           Color cardColor = valueString.contains('-') ? cardRed : cardGreen;
           return Card(
             color: cardColor,
@@ -20,7 +22,7 @@ class EventsList extends StatelessWidget {
             elevation: 3,
             child: ListTile(
               title: Text(
-                currentItem["name"] ?? "Erro ao retornar o nome",
+                event["name"] ?? "Erro ao retornar o nome",
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -30,17 +32,15 @@ class EventsList extends StatelessWidget {
                 children: <Widget>[
                   Align(
                     alignment: Alignment.topLeft,
-                    child: Text("Data: ${currentItem["date"].toString()}"),
+                    child: Text("Data: ${event["date"].toString()}"),
                   ),
                   Align(
                     alignment: Alignment.topLeft,
-                    child: Text(
-                        "Tipo de evento: ${currentItem["type"].toString()}"),
+                    child: Text("Tipo de evento: ${event["type"].toString()}"),
                   ),
                   Align(
                     alignment: Alignment.topLeft,
-                    child:
-                        Text("Valor: R\$ ${currentItem["value"].toString()}"),
+                    child: Text("Valor: R\$ ${event["value"].toString()}"),
                   ),
                 ],
               ),
@@ -52,13 +52,13 @@ class EventsList extends StatelessWidget {
                     onPressed: () => showForm(
                       context,
                       null,
-                      currentItem["key"],
+                      event["key"],
                     ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () => deleteItem(
-                      currentItem["key"],
+                      event["key"],
                     ),
                   ),
                 ],
