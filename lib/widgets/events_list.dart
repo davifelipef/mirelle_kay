@@ -9,6 +9,7 @@ class EventsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Events list received: ${events.length} items");
     return Expanded(
       child: ListView.builder(
         itemCount: events.length,
@@ -16,6 +17,8 @@ class EventsList extends StatelessWidget {
           final event = events[index];
           String valueString = event["value"] ?? "0.0";
           Color cardColor = valueString.contains('-') ? cardRed : cardGreen;
+          // Add a print statement here to see the received event data
+          print("Event at index $index: $event");
           return Card(
             color: cardColor,
             margin: const EdgeInsets.all(10),

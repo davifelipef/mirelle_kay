@@ -31,9 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Updated the UI");
       _filteredData = data;
     });
+    // Call setState again to trigger a rebuild
+    setState(() {});
   }
 
   void createNewItem(Map<String, dynamic> newEvent) {
+    print("Voice callback called");
     createItem(newEvent, _refreshItems);
   }
 

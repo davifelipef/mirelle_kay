@@ -81,6 +81,7 @@ Future<List<dynamic>> refreshItems() async {
         itemDate.month == currentDate.month;
   }).toList();
 
+  print("Filtered data: $filteredData");
   return filteredData;
 }
 
@@ -142,8 +143,9 @@ Future<void> createItem(
     print("Creating item: $newEvent");
     await eventsBox.add(newEvent);
     print("Item created successfully.");
-    loadEventsFromHive();
-    onComplete(); // Notify to refresh the UI
+
+    // Call the callback function to notify the UI
+    onComplete();
   } catch (e) {
     print("Error creating item: $e");
   }
