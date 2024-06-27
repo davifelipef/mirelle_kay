@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mirelle_kay/utils/helpers.dart';
 import 'package:mirelle_kay/utils/config.dart';
 import 'package:intl/intl.dart';
+import 'package:mirelle_kay/providers/filtered_events.dart';
 
 class AddEventButton extends StatelessWidget {
-  const AddEventButton({super.key});
+  const AddEventButton({super.key, required this.filteredEventsProvider});
+
+  final FilteredEventsProvider filteredEventsProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +15,7 @@ class AddEventButton extends StatelessWidget {
     return FloatingActionButton(
       onPressed: () {
         print('FloatingActionButton pressed'); // Debugging statement
-        showForm(context, formattedDate, null);
+        showForm(context, formattedDate, null, filteredEventsProvider);
       },
       backgroundColor: primaryButton,
       foregroundColor: primaryBackground,

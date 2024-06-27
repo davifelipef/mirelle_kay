@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mirelle_kay/providers/filtered_events.dart';
 
 void updatePageTitle(String title) {
   pageTitle = title;
@@ -209,7 +210,8 @@ Future<void> deleteItem(int itemKey) async {
   }*/
 
 // Creates the dialog to add new names to the name list
-void showForm(BuildContext ctx, String? formattedDate, int? itemKey) async {
+void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
+    FilteredEventsProvider provider) async {
   print("Show form function called");
   if (itemKey != null) {
     final existingItem =

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mirelle_kay/utils/helpers.dart';
 import 'package:mirelle_kay/utils/config.dart';
+import 'package:provider/provider.dart';
+import 'package:mirelle_kay/providers/filtered_events.dart';
 
 class EventsList extends StatelessWidget {
   final List<dynamic> events;
@@ -52,11 +54,12 @@ class EventsList extends StatelessWidget {
                 children: <Widget>[
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: () => showForm(
-                      context,
-                      null,
-                      event["key"],
-                    ),
+                    onPressed: () {
+                      final filteredEventsProvider =
+                          Provider.of<FilteredEventsProvider>(context);
+                      showForm(context, formattedDate, event["key"],
+                          filteredEventsProvider);
+                    },
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete),

@@ -1,8 +1,10 @@
 import 'package:mirelle_kay/widgets/app_bar.dart';
 import 'package:mirelle_kay/widgets/balance_card.dart';
 import 'package:mirelle_kay/widgets/date_selection.dart';
+import 'package:mirelle_kay/providers/filtered_events.dart';
 import 'package:mirelle_kay/utils/helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:mirelle_kay/widgets/drawer.dart';
 import 'package:mirelle_kay/widgets/add_event_button.dart';
 import 'package:mirelle_kay/widgets/events_list.dart';
@@ -15,33 +17,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<dynamic> _filteredData = [];
   @override
   void initState() {
     super.initState();
     updatePageTitle("Fluxo de caixa");
     loadEventsFromHive();
-    _refreshItems();
   }
 
   //This function updartes the UI
-  Future<void> _refreshItems() async {
+  /*Future<void> _refreshItems() async {
     final data = await refreshItems();
-    setState(() {
-      print("Updated the UI");
-      _filteredData = data;
-    });
-    // Call setState again to trigger a rebuild
-    setState(() {});
-  }
-
-  void createNewItem(Map<String, dynamic> newEvent) {
-    print("Voice callback called");
-    createItem(newEvent, _refreshItems);
-  }
+    filteredEventsProvider.updateFilteredData(data);
+  }*/
 
   @override
   Widget build(BuildContext context) {
+    final filteredEventsProvider = Provider.of<FilteredEventsProvider>(context);
     return Scaffold(
       appBar: const AppBarDesign(),
       drawer: const MyDrawer(),
@@ -53,10 +44,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const BalanceCard(),
           const Divider(),
-          EventsList(events: _filteredData),
+          EventsList(events: filteredEventsProvider.filteredData),
         ],
       ),
-      floatingActionButton: const AddEventButton(),
+      floatingActionButton: Provider<FilteredEventsProvider>(
+        create: (_) =>
+            filteredEventsProvider, // Pass the existing provider instance
+        child: AddEventButton(
+          filteredEventsProvider: filteredEventsProvider,
+        ),
+      ),
     );
   }
 }
