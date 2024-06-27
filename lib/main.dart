@@ -26,8 +26,11 @@ void main() async {
     yield LicenseEntryWithLineBreaks(['google_fonts'], license);
   });
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => FilteredEventsProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => FilteredEventsProvider()),
+        // With a multiprovider I can add more providers as needed
+      ],
       child: const MyApp(),
     ),
   );

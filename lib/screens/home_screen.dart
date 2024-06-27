@@ -12,23 +12,24 @@ import 'package:mirelle_kay/widgets/events_list.dart';
 class HomeScreen extends StatefulWidget {
   static const String routeName = "/home";
   const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late FilteredEventsProvider filteredEventsProvider;
+
   @override
   void initState() {
     super.initState();
     updatePageTitle("Fluxo de caixa");
-    loadEventsFromHive();
+    filteredEventsProvider =
+        Provider.of<FilteredEventsProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadEventsFromHive(filteredEventsProvider);
+    });
   }
-
-  //This function updartes the UI
-  /*Future<void> _refreshItems() async {
-    final data = await refreshItems();
-    filteredEventsProvider.updateFilteredData(data);
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
           EventsList(events: filteredEventsProvider.filteredData),
         ],
       ),
-      floatingActionButton: Provider<FilteredEventsProvider>(
-        create: (_) =>
-            filteredEventsProvider, // Pass the existing provider instance
-        child: AddEventButton(
-          filteredEventsProvider: filteredEventsProvider,
-        ),
+      floatingActionButton: AddEventButton(
+        filteredEventsProvider: filteredEventsProvider,
       ),
     );
   }

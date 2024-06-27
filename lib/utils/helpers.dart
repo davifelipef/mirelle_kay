@@ -17,7 +17,7 @@ void updatePageTitle(String title) {
 // Helper function that updates the current date by calculating the new date based on the index
 void updateCurrentDate(int index) {
   currentDate = calculateDate(index);
-  refreshItems();
+  refreshItems;
 }
 
 // Calculates the target date based on the given index
@@ -43,53 +43,10 @@ DateTime calculateDate(int index) {
       1); // Creates and returns the newly DateTime object
 }
 
-// Function that sums the events
-double sumOfEvents() {
-  double total = 0.0;
-  for (final item in events) {
-    // Retrieve the event value
-    final eventValue = item["value"] ?? "0,00";
-    // Convert the value to a double, replacing commas with dots if necessary
-    final eventsSum = double.tryParse(eventValue.replaceAll(',', '.')) ?? 0.00;
-    // Add the value to the total sum
-    total += eventsSum;
-  }
-  return total;
-}
-
-// Updates the screen when a new event is added
-Future<List<dynamic>> refreshItems() async {
-  final data = eventsBox.keys.map((key) {
-    final item = eventsBox.get(key);
-    return {
-      "key": key, // unique key of the event
-      "name": item!["name"], // name of the event
-      "type": item["type"], // type of the event: money entry or exit
-      "value": item["value"], // value moved
-      "date": item["date"], // date the event was registered
-      "dateTime": DateFormat('dd/MM/yyyy').parse(item["date"]), // parsed date
-    };
-  }).toList();
-
-  // Sort the list based on the "dateTime" field in descending order - from b to a
-  data.sort((a, b) =>
-      (b["dateTime"] as DateTime).compareTo(a["dateTime"] as DateTime));
-
-  // Filters the list based on the selected month
-  final filteredData = data.where((item) {
-    final itemDate = item["dateTime"] as DateTime;
-    return itemDate.year == currentDate.year &&
-        itemDate.month == currentDate.month;
-  }).toList();
-
-  print("Filtered data: $filteredData");
-  return filteredData;
-}
-
 // Updates the page controller
 PageController calcPageController() {
   pageController = PageController(initialPage: initialPage);
-  refreshItems();
+  refreshItems;
   return pageController;
 }
 
@@ -112,18 +69,6 @@ Future<void> loadJsonToHive() async {
   }
 }
 
-Future<void> loadEventsFromHive() async {
-  try {
-    final box = Hive.box<Map<dynamic, dynamic>>('events_box');
-    events = box.values.map((item) {
-      return item.cast<String, dynamic>();
-    }).toList();
-    print("Loaded events from Hive: $events");
-  } catch (e) {
-    print("Error loading events from Hive: $e");
-  }
-}
-
 // Creates a new item
 /*Future<void> createItem(Map<String, dynamic> newEvent) async {
   try {
@@ -137,92 +82,112 @@ Future<void> loadEventsFromHive() async {
   }
 }*/
 
+// Events creation related code
+// Updates the screen when a new event is added
+Future<List<dynamic>> refreshItems(FilteredEventsProvider provider) async {
+  final data = eventsBox.keys.map((key) {
+    final item = eventsBox.get(key);
+    return {
+      "key": key,
+      "name": item!["name"],
+      "type": item["type"],
+      "value": item["value"],
+      "date": item["date"],
+      "dateTime": DateFormat('dd/MM/yyyy').parse(item["date"]),
+    };
+  }).toList();
+
+  data.sort((a, b) =>
+      (b["dateTime"] as DateTime).compareTo(a["dateTime"] as DateTime));
+
+  final filteredData = data.where((item) {
+    final itemDate = item["dateTime"] as DateTime;
+    return itemDate.year == currentDate.year &&
+        itemDate.month == currentDate.month;
+  }).toList();
+
+  print("Filtered data: $filteredData");
+
+  provider.updateFilteredData(filteredData);
+
+  return filteredData;
+}
+
+// Load the events from the Hive
+Future<void> loadEventsFromHive(FilteredEventsProvider provider) async {
+  try {
+    final box = Hive.box<Map<dynamic, dynamic>>('events_box');
+    events = box.values.map((item) {
+      return item.cast<String, dynamic>();
+    }).toList();
+    print("Loaded events from Hive: $events");
+
+    await refreshItems(provider);
+  } catch (e) {
+    print("Error loading events from Hive: $e");
+  }
+}
+
 // Creates a new item
-Future<void> createItem(
-    Map<String, dynamic> newEvent, VoidCallback onComplete) async {
+Future<void> createItem(Map<String, dynamic> newEvent, VoidCallback onComplete,
+    FilteredEventsProvider provider) async {
   try {
     print("Creating item: $newEvent");
     await eventsBox.add(newEvent);
     print("Item created successfully.");
-
-    // Call the callback function to notify the UI
-    onComplete();
+    events.add(newEvent);
+    onComplete(); // Notify UI
   } catch (e) {
     print("Error creating item: $e");
   }
 }
 
-// Update an existing item
-Future<void> updateItem(int itemKey, Map<String, dynamic> item) async {
+// Updates an existing item
+Future<void> updateItem(int itemKey, Map<String, dynamic> item,
+    FilteredEventsProvider provider) async {
+  print("Update item function called");
   await eventsBox.put(itemKey, item);
-  await loadEventsFromHive();
-  await refreshItems(); // Updates the UI
+  await refreshItems(provider); // Updates the UI and notifies listeners
 }
 
 // Delete an existing item
-Future<void> deleteItem(int itemKey) async {
-  eventsMap.remove(itemKey);
-  print("$itemKey removed from the eventsMap");
-  print("Current eventsMap: $eventsList");
-
-  // Get the name associated with the itemKey being deleted
-  final item = events.firstWhere((element) => element["key"] == itemKey);
-  final nameToDelete = item["name"];
-
+Future<void> deleteItem(int itemKey, FilteredEventsProvider provider) async {
   await eventsBox.delete(itemKey);
-  print("$itemKey removed from the nameBox");
-  print("Current nameBox: $eventsList");
-
-  // Remove the name from eventsList
-  eventsList.remove(nameToDelete);
-  print("$itemKey removed from the eventsList");
-  print("Current eventsList: $eventsList");
-
-  deletedItemCount++;
-
-  // Reset the timer if it's already running
-  /*messageTimer?.cancel();
-    messageTimer = Timer(const Duration(seconds: 1), deletedItemMessage);*/
-
-  await loadEventsFromHive();
-  await refreshItems(); // Updates the UI
+  await refreshItems(provider); // Updates the UI and notifies listeners
 }
 
-// Message to inform an item was deleted
-/*Future<void> deletedItemMessage() async {
-    if (deletedItemCount > 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("$deletedItemCount itens deletados."),
-        ),
-      );
-      // Reset the deleted item count
-      deletedItemCount = 0;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Item deletado."),
-        ),
-      );
-      // Reset the count
-      deletedItemCount = 0;
-    }
-  }*/
-
-// Creates the dialog to add new names to the name list
 void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
     FilteredEventsProvider provider) async {
   print("Show form function called");
+
+  // Check if itemKey is provided and not null
   if (itemKey != null) {
-    final existingItem =
-        events.firstWhere((element) => element["key"] == itemKey);
-    nameController.text = existingItem["name"];
-    dateController.text = existingItem["date"];
-    selectedType = existingItem["type"];
-    valueController.text = existingItem["value"];
-    formattedDate = existingItem["date"];
+    // Find the item with the specified itemKey in events list
+    final existingItem = events.firstWhere(
+        (element) => element["key"] == itemKey,
+        orElse: () => Map<String, dynamic>());
+    print("Existing item(s): $existingItem");
+    print("Item with key $itemKey found: ${existingItem.isNotEmpty}");
+    print("Current events list: $events");
+
+    // Load existing item data into form fields
+    if (existingItem.isNotEmpty) {
+      nameController.text = existingItem["name"];
+      dateController.text = existingItem["date"];
+      selectedType = existingItem["type"];
+      valueController.text = existingItem["value"];
+      formattedDate = existingItem["date"];
+    } else {
+      // Handle case where itemKey is not found in events list (debug or error handling)
+      print("Item with key $itemKey not found in events list.");
+      // Reset form fields or show appropriate message
+      nameController.text = "";
+      dateController.text = formattedDate.toString();
+      selectedType = null;
+      valueController.text = "0.00";
+    }
   } else {
-    // Clear the text fields
+    // Handle case when adding a new item (itemKey is null)
     nameController.text = "";
     dateController.text = formattedDate.toString();
     selectedType = null;
@@ -246,7 +211,6 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
               key: formKey,
               child: Column(
                 children: <Widget>[
-                  // Name of the event text field
                   TextFormField(
                     controller: nameController,
                     decoration: const InputDecoration(
@@ -259,10 +223,7 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  // Date edit field
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: dateController,
                     decoration: const InputDecoration(
@@ -274,17 +235,13 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                       }
                       return null;
                     },
-                    readOnly:
-                        true, // Makes the field read-only so that the keyboard won't appear
+                    readOnly: true,
                     onTap: () async {
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: tempPickedDate ??
-                            currentDate, // Use the current date as the initial date
-                        firstDate: DateTime(
-                            2000), // Set the earliest date that can be picked
-                        lastDate: DateTime(
-                            2101), // Set the latest date that can be picked
+                        initialDate: tempPickedDate ?? currentDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
                       );
 
                       if (pickedDate != tempPickedDate) {
@@ -296,10 +253,7 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                       }
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  // Type of event dropdown menu
+                  const SizedBox(height: 20),
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       hintText: "Escolha um tipo de registro",
@@ -334,10 +288,7 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  // Value of the event number field
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: valueController,
                     decoration: const InputDecoration(
@@ -345,36 +296,26 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
-                      FilteringTextInputFormatter
-                          .digitsOnly, // Allow only digits
+                      FilteringTextInputFormatter.digitsOnly,
                     ],
                     onChanged: (text) {
                       if (text.isEmpty) {
-                        // Set default value '0.00' if text is empty
                         valueController.text = '0.00';
                         return;
                       }
 
-                      // Parse the input text as a decimal number
                       double currentValue = double.tryParse(text) ?? 0.0;
-
-                      // Shift the decimal point for each digit entered
                       currentValue = currentValue / 100.0;
 
-                      // Handle the logic for 'Entrada' and 'Saída'
                       if (selectedType == 'Entrada' && currentValue < 0) {
                         currentValue = -currentValue;
                       } else if (selectedType == 'Saída' && currentValue > 0) {
                         currentValue = -currentValue;
                       }
 
-                      // Format the value to 2 decimal places
                       String formattedText = currentValue.toStringAsFixed(2);
-
-                      // Update the text field with the formatted value
                       valueController.text = formattedText;
 
-                      // Move cursor to end of text after modifying the value
                       valueController.selection = TextSelection.fromPosition(
                         TextPosition(offset: valueController.text.length),
                       );
@@ -386,9 +327,7 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryButton,
@@ -400,19 +339,20 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                           "name": nameController.text,
                           "type": selectedType,
                           "value": valueController.text,
-                          "date": formattedDate,
+                          "date": dateController.text,
                         };
                         if (itemKey == null) {
-                          await createItem(newEvent, refreshItems);
+                          await createItem(newEvent, () async {
+                            await refreshItems(provider);
+                          }, provider);
                         } else {
-                          await updateItem(itemKey, newEvent);
+                          await updateItem(itemKey, newEvent, provider);
                         }
-                        // Clear the text fields
                         nameController.clear();
                         dateController.text = formattedDate.toString();
                         selectedType = null;
                         valueController.clear();
-                        Navigator.of(context).pop(); // Closes the modal window
+                        Navigator.of(context).pop();
                       }
                     },
                     child: const Text("Salvar"),
@@ -425,4 +365,39 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
       ),
     ),
   );
+}
+
+// Message to inform an item was deleted
+/*Future<void> deletedItemMessage() async {
+    if (deletedItemCount > 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("$deletedItemCount itens deletados."),
+        ),
+      );
+      // Reset the deleted item count
+      deletedItemCount = 0;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Item deletado."),
+        ),
+      );
+      // Reset the count
+      deletedItemCount = 0;
+    }
+  }*/
+
+// Function that sums the events
+double sumOfEvents(List<dynamic> events) {
+  double total = 0.0;
+  for (final item in events) {
+    // Retrieve the event value
+    final eventValue = item["value"] ?? "0.00";
+    // Convert the value to a double, replacing commas with dots if necessary
+    final eventsSum = double.tryParse(eventValue.replaceAll(',', '.')) ?? 0.00;
+    // Add the value to the total sum
+    total += eventsSum;
+  }
+  return total;
 }
