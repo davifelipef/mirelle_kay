@@ -15,7 +15,7 @@ import 'package:mirelle_kay/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // Initialize the hive
   await Hive.initFlutter();
 
   // Open Hive boxes
@@ -27,11 +27,13 @@ void main() async {
     yield LicenseEntryWithLineBreaks(['google_fonts'], license);
   });
   runApp(
+    // With a multiprovider I can add more providers as needed
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => FilteredEventsProvider()),
-        ChangeNotifierProvider(create: (context) => FilteredSalesProvider()),
-        // With a multiprovider I can add more providers as needed
+        ChangeNotifierProvider(
+            create: (context) => FilteredEventsProvider()), // Events provider
+        ChangeNotifierProvider(
+            create: (context) => FilteredSalesProvider()), // Sales provider
       ],
       child: const MyApp(),
     ),
