@@ -46,17 +46,22 @@ class EventsList extends StatelessWidget {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                // Edit button setup
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
+                    print("Edit button clicked, showForm called");
                     showForm(context, formattedDate, event["key"],
                         filteredEventsProvider);
                   },
                 ),
+                // Delete button setup
                 IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () =>
-                      deleteItem(event["key"], filteredEventsProvider),
+                  onPressed: () {
+                    print("Delete button clicked");
+                    deleteItem(event["key"], filteredEventsProvider);
+                  },
                 ),
               ],
             ),

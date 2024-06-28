@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:async';
 
-//Box<Map<dynamic, dynamic>> get eventsBox => Hive.box<Map<dynamic, dynamic>>('events_box');
-
 // Text fields setup variables
 final TextEditingController nameController = TextEditingController();
 final TextEditingController typeController = TextEditingController();

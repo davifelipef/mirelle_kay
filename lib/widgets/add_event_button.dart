@@ -14,7 +14,8 @@ class AddEventButton extends StatelessWidget {
     formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
     return FloatingActionButton(
       onPressed: () {
-        print('FloatingActionButton pressed'); // Debugging statement
+        print(
+            'Add new event button clicked, showForm called'); // Debugging statement
         showForm(context, formattedDate, null, filteredEventsProvider);
       },
       backgroundColor: primaryButton,

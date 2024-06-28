@@ -69,39 +69,37 @@ Future<void> loadJsonToHive() async {
   }
 }
 
-// Creates a new item
-/*Future<void> createItem(Map<String, dynamic> newEvent) async {
-  try {
-    print("Creating item: $newEvent");
-    await eventsBox.add(newEvent);
-    print("Item created successfully.");
-    loadEventsFromHive();
-    refreshItems(); // Updates the UI
-  } catch (e) {
-    print("Error creating item: $e");
-  }
-}*/
-
 // Events creation related code
 // Updates the screen when a new event is added
 Future<List<dynamic>> refreshItems(FilteredEventsProvider provider) async {
-  final data = eventsBox.keys.map((key) {
-    final item = eventsBox.get(key);
-    return {
-      "key": key,
-      "name": item!["name"],
-      "type": item["type"],
-      "value": item["value"],
-      "date": item["date"],
-      "dateTime": DateFormat('dd/MM/yyyy').parse(item["date"]),
-    };
-  }).toList();
+  final data = eventsBox.keys
+      .map((key) {
+        final item = eventsBox.get(key);
+        // Ensure item is not null and of the correct type
+        if (item != null) {
+          final eventItem = item.cast<String, dynamic>();
+          events.add(eventItem);
+          return {
+            "key": key,
+            "name": eventItem["name"],
+            "type": eventItem["type"],
+            "value": eventItem["value"],
+            "date": eventItem["date"],
+            "dateTime": DateFormat('dd/MM/yyyy').parse(eventItem["date"]),
+          };
+        } else {
+          print("Invalid item type: $item");
+          return null;
+        }
+      })
+      .where((item) => item != null)
+      .toList();
 
   data.sort((a, b) =>
-      (b["dateTime"] as DateTime).compareTo(a["dateTime"] as DateTime));
+      (b?["dateTime"] as DateTime).compareTo(a?["dateTime"] as DateTime));
 
   final filteredData = data.where((item) {
-    final itemDate = item["dateTime"] as DateTime;
+    final itemDate = item?["dateTime"] as DateTime;
     return itemDate.year == currentDate.year &&
         itemDate.month == currentDate.month;
   }).toList();
@@ -116,7 +114,7 @@ Future<List<dynamic>> refreshItems(FilteredEventsProvider provider) async {
 // Load the events from the Hive
 Future<void> loadEventsFromHive(FilteredEventsProvider provider) async {
   try {
-    final box = Hive.box<Map<dynamic, dynamic>>('events_box');
+    final box = Hive.box<Map<dynamic, dynamic>>('events_box'); // Adjusted type
     events = box.values.map((item) {
       return item.cast<String, dynamic>();
     }).toList();
@@ -135,14 +133,13 @@ Future<void> createItem(Map<String, dynamic> newEvent, VoidCallback onComplete,
     print("Creating item: $newEvent");
     await eventsBox.add(newEvent);
     print("Item created successfully.");
-    events.add(newEvent);
     onComplete(); // Notify UI
   } catch (e) {
     print("Error creating item: $e");
   }
 }
 
-// Updates an existing item
+// Update an existing item
 Future<void> updateItem(int itemKey, Map<String, dynamic> item,
     FilteredEventsProvider provider) async {
   print("Update item function called");
@@ -162,10 +159,9 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
 
   // Check if itemKey is provided and not null
   if (itemKey != null) {
-    // Find the item with the specified itemKey in events list
-    final existingItem = events.firstWhere(
-        (element) => element["key"] == itemKey,
-        orElse: () => Map<String, dynamic>());
+    // Find the item with the specified itemKey directly in the Hive box
+    final existingItem = eventsBox.get(itemKey)?.cast<String, dynamic>() ?? {};
+
     print("Existing item(s): $existingItem");
     print("Item with key $itemKey found: ${existingItem.isNotEmpty}");
     print("Current events list: $events");
@@ -346,13 +342,23 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
                             await refreshItems(provider);
                           }, provider);
                         } else {
-                          await updateItem(itemKey, newEvent, provider);
+                          final updatedEvent = {
+                            "key": itemKey,
+                            "name": nameController.text,
+                            "type": selectedType,
+                            "value": valueController.text,
+                            "date": dateController.text,
+                          };
+                          await updateItem(itemKey, updatedEvent, provider);
                         }
-                        nameController.clear();
-                        dateController.text = formattedDate.toString();
-                        selectedType = null;
-                        valueController.clear();
-                        Navigator.of(context).pop();
+                        if (context.mounted) {
+                          // Using context.mounted check
+                          nameController.clear();
+                          dateController.text = formattedDate.toString();
+                          selectedType = null;
+                          valueController.clear();
+                          Navigator.of(context).pop();
+                        }
                       }
                     },
                     child: const Text("Salvar"),
