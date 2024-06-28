@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mirelle_kay/providers/filtered_events.dart';
+import 'package:mirelle_kay/providers/filtered_sales.dart';
 import 'package:mirelle_kay/screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,6 +30,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => FilteredEventsProvider()),
+        ChangeNotifierProvider(create: (context) => FilteredSalesProvider()),
         // With a multiprovider I can add more providers as needed
       ],
       child: const MyApp(),
@@ -50,9 +52,11 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
+      // Adds support to Brazilian Portuguese localization
       supportedLocales: const [
-        Locale('pt', 'BR'), // Brazilian Portuguese
+        Locale('pt', 'BR'),
       ],
       debugShowCheckedModeBanner:
           false, //if set to false, disables the debug banner

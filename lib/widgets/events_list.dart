@@ -13,7 +13,6 @@ class EventsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final filteredEventsProvider =
         Provider.of<FilteredEventsProvider>(context, listen: false);
-    print("Events list received: ${events.length} items");
     return ListView.builder(
       shrinkWrap: true,
       itemCount: events.length,
@@ -21,8 +20,6 @@ class EventsList extends StatelessWidget {
         final event = events[index];
         String valueString = event["value"] ?? "0.0";
         Color cardColor = valueString.contains('-') ? cardRed : cardGreen;
-        // Add a print statement here to see the received event data
-        print("Event at index $index: $event");
         return Card(
           color: cardColor,
           margin: const EdgeInsets.all(10),
@@ -50,7 +47,6 @@ class EventsList extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    print("Edit button clicked, showForm called");
                     showForm(context, formattedDate, event["key"],
                         filteredEventsProvider);
                   },
@@ -59,7 +55,6 @@ class EventsList extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    print("Delete button clicked");
                     deleteItem(event["key"], filteredEventsProvider);
                   },
                 ),

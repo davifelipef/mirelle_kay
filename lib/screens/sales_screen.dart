@@ -1,5 +1,5 @@
 import 'package:mirelle_kay/widgets/app_bar.dart';
-import 'package:mirelle_kay/widgets/balance_card.dart';
+import 'package:mirelle_kay/widgets/sales_card.dart';
 import 'package:mirelle_kay/widgets/date_selection.dart';
 import 'package:mirelle_kay/utils/helpers.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ class _SalesScreenState extends State<SalesScreen> {
             padding: const EdgeInsetsDirectional.only(top: 10.0),
             child: DateSelection(pageController: calcPageController()),
           ),
-          const BalanceCard(),
+          const SalesCard(),
           const Divider(),
           // TODO - Rest of the code
         ],

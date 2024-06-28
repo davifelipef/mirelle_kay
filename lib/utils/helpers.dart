@@ -62,10 +62,8 @@ Future<void> loadJsonToHive() async {
       final product = jsonData[i];
       productsBox.put(i, product);
     }
-
-    print('Data loaded from JSON to Hive');
   } else {
-    print('JSON file not found');
+    // Do nothing
   }
 }
 
@@ -88,7 +86,6 @@ Future<List<dynamic>> refreshItems(FilteredEventsProvider provider) async {
             "dateTime": DateFormat('dd/MM/yyyy').parse(eventItem["date"]),
           };
         } else {
-          print("Invalid item type: $item");
           return null;
         }
       })
@@ -104,8 +101,6 @@ Future<List<dynamic>> refreshItems(FilteredEventsProvider provider) async {
         itemDate.month == currentDate.month;
   }).toList();
 
-  print("Filtered data: $filteredData");
-
   provider.updateFilteredData(filteredData);
 
   return filteredData;
@@ -118,7 +113,6 @@ Future<void> loadEventsFromHive(FilteredEventsProvider provider) async {
     events = box.values.map((item) {
       return item.cast<String, dynamic>();
     }).toList();
-    print("Loaded events from Hive: $events");
 
     await refreshItems(provider);
   } catch (e) {
@@ -130,9 +124,8 @@ Future<void> loadEventsFromHive(FilteredEventsProvider provider) async {
 Future<void> createItem(Map<String, dynamic> newEvent, VoidCallback onComplete,
     FilteredEventsProvider provider) async {
   try {
-    print("Creating item: $newEvent");
     await eventsBox.add(newEvent);
-    print("Item created successfully.");
+
     onComplete(); // Notify UI
   } catch (e) {
     print("Error creating item: $e");
@@ -142,7 +135,6 @@ Future<void> createItem(Map<String, dynamic> newEvent, VoidCallback onComplete,
 // Update an existing item
 Future<void> updateItem(int itemKey, Map<String, dynamic> item,
     FilteredEventsProvider provider) async {
-  print("Update item function called");
   await eventsBox.put(itemKey, item);
   await refreshItems(provider); // Updates the UI and notifies listeners
 }
@@ -155,16 +147,10 @@ Future<void> deleteItem(int itemKey, FilteredEventsProvider provider) async {
 
 void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
     FilteredEventsProvider provider) async {
-  print("Show form function called");
-
   // Check if itemKey is provided and not null
   if (itemKey != null) {
     // Find the item with the specified itemKey directly in the Hive box
     final existingItem = eventsBox.get(itemKey)?.cast<String, dynamic>() ?? {};
-
-    print("Existing item(s): $existingItem");
-    print("Item with key $itemKey found: ${existingItem.isNotEmpty}");
-    print("Current events list: $events");
 
     // Load existing item data into form fields
     if (existingItem.isNotEmpty) {
@@ -175,7 +161,6 @@ void showForm(BuildContext ctx, String? formattedDate, int? itemKey,
       formattedDate = existingItem["date"];
     } else {
       // Handle case where itemKey is not found in events list (debug or error handling)
-      print("Item with key $itemKey not found in events list.");
       // Reset form fields or show appropriate message
       nameController.text = "";
       dateController.text = formattedDate.toString();
