@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mirelle_kay/data/hive_boxes.dart';
 import 'package:mirelle_kay/providers/filtered_events.dart';
 
 void updatePageTitle(String title) {
